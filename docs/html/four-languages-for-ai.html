@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Four Languages for AI — Python, TypeScript, Go & Rust in Detail</title>
+<style>
+:root{--dark:#0f172a;--slate:#334155;--border:#e2e8f0;--light:#f8fafc;--py:#3776ab;--ts:#3178c6;--go:#00add8;--rs:#b7410e}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--dark);line-height:1.65}
+header{background:linear-gradient(135deg,#0f172a,#1e293b 60%,#334155);color:#fff;padding:56px 24px 44px}
+.wrap{max-width:1020px;margin:0 auto;padding:0 22px}
+header h1{font-size:40px;line-height:1.12;margin:0 0 14px}header p{font-size:19px;opacity:.93;max-width:800px}
+.badge{display:inline-block;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:700;margin-right:8px;color:#fff}
+.py{background:var(--py)}.ts{background:var(--ts)}.go{background:var(--go)}.rs{background:var(--rs)}
+nav{background:var(--light);border-bottom:1px solid var(--border);padding:16px 0}nav a{color:#2563eb;text-decoration:none;margin-right:15px;font-weight:600;font-size:14px}
+h2{font-size:30px;margin:48px 0 12px;padding-top:18px;border-top:2px solid var(--border)}h3{font-size:21px;margin:26px 0 8px}h4{font-size:17px;margin:18px 0 6px}
+p,li{font-size:16px;color:#1e293b}code{background:#eef2ff;padding:2px 6px;border-radius:6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em}
+pre{background:#0f172a;color:#e2e8f0;padding:18px;border-radius:12px;overflow:auto;font-size:13.5px;line-height:1.5}pre code{background:none;color:inherit;padding:0}
+.callout{border-left:5px solid #2563eb;background:#eff6ff;padding:16px 18px;border-radius:8px;margin:18px 0}
+.good{border-color:#0f766e;background:#f0fdfa}.warn{border-color:#b45309;background:#fffbeb}.rust{border-color:var(--rs);background:#fff7ed}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.5px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:#f1f5f9}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:18px 0}.card{border:1px solid var(--border);border-radius:12px;padding:18px}.card h4{margin-top:0}
+.kicker{color:#2563eb;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+.small{font-size:14px;color:var(--slate)}footer{background:var(--dark);color:#cbd5e1;padding:32px 0;margin-top:60px}
+.langhead{border-radius:12px;padding:20px 22px;color:#fff;margin:34px 0 8px}.langhead h2{border:none;margin:0;padding:0;color:#fff}.langhead p{color:#f1f5f9;margin:6px 0 0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<span class="badge py">Python</span><span class="badge ts">TypeScript</span><span class="badge go">Go</span><span class="badge rs">Rust</span>
+<h1>Four Languages for AI</h1>
+<p>How Python, TypeScript, Go, and Rust are each used to build real AI systems — in detail: what layer each owns, what libraries matter, what code looks like, when to choose which, and how production systems combine all four.</p>
+<p class="small" style="color:#e2e8f0">Prepared for Ranadhir Ghosh • November 11, 2026 • Companion to “TypeScript for AI”</p>
+</div></header>
+<nav><div class="wrap">
+<a href="#map">The Map</a><a href="#python">Python</a><a href="#typescript">TypeScript</a><a href="#go">Go</a><a href="#rust">Rust</a><a href="#compare">Comparison</a><a href="#together">Together</a><a href="#choose">Choosing</a>
+</div></nav>
+<main class="wrap">
+
+<section id="map">
+<p class="kicker">The One Idea That Organises Everything</p>
+<h2>An AI system is not one program — it is layers</h2>
+<p>Ask “which language for AI?” and you get a religious war. Ask “which language for <em>this layer</em> of an AI system?” and you get engineering. A production AI system has roughly seven layers, and each of the four languages owns different ones:</p>
+<table>
+<tr><th>Layer</th><th>What happens there</th><th>Primary language(s)</th></tr>
+<tr><td>1. Research &amp; training</td><td>Experiments, training, fine-tuning, evaluation of models</td><td><strong>Python</strong> (almost exclusively)</td></tr>
+<tr><td>2. Data &amp; ML pipelines</td><td>Ingestion, feature engineering, batch jobs, dataset curation</td><td><strong>Python</strong>, Go for high-throughput ingestion</td></tr>
+<tr><td>3. Inference &amp; serving</td><td>Running models at scale, low latency, batching, GPU scheduling</td><td>Python frameworks on top; <strong>Rust / Go / C++</strong> underneath and around</td></tr>
+<tr><td>4. Agent &amp; application logic</td><td>LLM calls, RAG, tools, workflows, business rules</td><td><strong>TypeScript</strong> and Python</td></tr>
+<tr><td>5. Product &amp; UI</td><td>Chat interfaces, dashboards, mobile, streaming UX</td><td><strong>TypeScript</strong> (only real option on web)</td></tr>
+<tr><td>6. Platform &amp; infrastructure</td><td>Gateways, queues, observability, vector DBs, tokenisers, infra tooling</td><td><strong>Go and Rust</strong></td></tr>
+<tr><td>7. Edge &amp; devices</td><td>On-device inference, embedded, WASM, privacy-sensitive ML</td><td><strong>Rust</strong>, TypeScript (browser ML)</td></tr>
+</table>
+<div class="callout"><strong>The short version:</strong> Python <em>makes</em> models. TypeScript <em>products</em> them. Go <em>operates</em> them at scale. Rust <em>accelerates</em> them. Most serious AI organisations use at least three of the four — deliberately, per layer.</div>
+</section>
+
+<div class="langhead" style="background:var(--py)"><h2>Python — the language models are born in</h2><p>The research, training, and data-science layer. If a paper has code, it is Python.</p></div>
+<section id="python">
+<h3>Why Python won AI research</h3>
+<ul>
+<li><strong>The ecosystem is the moat:</strong> PyTorch, TensorFlow, JAX, Hugging Face Transformers, scikit-learn, NumPy, pandas — decades of compounding. Every new model, dataset, and technique ships Python-first, often Python-only.</li>
+<li><strong>Notebooks:</strong> Jupyter's experiment loop (run a cell, see a plot, adjust) matches how research actually works.</li>
+<li><strong>Glue power:</strong> Python calls C/C++/CUDA underneath — NumPy, PyTorch kernels, tokenisers — so it is slow as a language but fast as an orchestrator of fast code.</li>
+</ul>
+<h3>How Python is used in AI, concretely</h3>
+<h4>1. Training and fine-tuning</h4>
+<pre><code>from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer
+
+model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.1-8B")
+tok = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B")
+# Fine-tune (LoRA via peft), evaluate, export — all Python, all the time.
+# No serious team trains in TypeScript, Go, or Rust directly.</code></pre>
+<h4>2. LLM applications (the other half of Python's AI life)</h4>
+<p>LangChain (Python original), LlamaIndex, DSPy, Instructor, Pydantic AI, CrewAI / AutoGen for multi-agent work, and FastAPI backends. Python's superpower here is <strong>Pydantic</strong>: typed data models that double as LLM structured-output schemas — the same contract-first pattern TypeScript gets from Zod.</p>
+<pre><code>from pydantic import BaseModel, Field
+
+class Invoice(BaseModel):
+    vendor: str
+    total: float = Field(ge=0)
+    due_date: str | None = None
+# Pass Invoice as the response schema → validated, typed extraction.</code></pre>
+<h4>3. Data, evaluation, and MLOps</h4>
+<p>Dataset curation, embedding jobs, offline evals, experiment tracking (MLflow, Weights &amp; Biases), and serving wrappers (vLLM and Triton expose Python-first interfaces, FastAPI / LiteLLM gateways).</p>
+<h3>Python's limits — know them honestly</h3>
+<ul>
+<li><strong>Concurrency:</strong> the GIL makes CPU-bound parallelism awkward; async helps I/O, not compute.</li>
+<li><strong>Latency &amp; footprint:</strong> slow startup, heavy memory — painful for edge, CLIs, and tight-latency serving.</li>
+<li><strong>Type safety is opt-in:</strong> type hints + mypy/Pydantic help enormously, but the runtime will not save you the way a compiler does.</li>
+<li><strong>Distribution:</strong> shipping Python to end users (desktop, mobile, browser) is painful compared with a single Go/Rust binary or a web app.</li>
+</ul>
+<div class="callout good"><strong>Choose Python when:</strong> training, fine-tuning, research, data science, notebooks, evals, or when the library you need exists only in Python. That is a <em>lot</em> of AI — Python is not “one option”, it is the foundation.</div>
+</section>
+<div class="langhead" style="background:var(--ts)"><h2>TypeScript — the language AI products are built in</h2><p>The application, agent, and experience layer. Full detail in the companion guide “TypeScript for AI”.</p></div>
+<section id="typescript">
+<h3>Why TypeScript owns the product layer</h3>
+<ul>
+<li><strong>It is the web's language:</strong> every browser AI experience — streaming chat, copilots, dashboards — is TypeScript/React by necessity.</li>
+<li><strong>Typed SDKs for every provider:</strong> OpenAI, Anthropic, Gemini, Azure OpenAI, plus the Vercel AI SDK and LangChain.js. Model APIs change fast; the compiler tells you where.</li>
+<li><strong>JSON-native:</strong> AI is JSON in, JSON out. TypeScript + Zod turns untrusted model output into trusted, typed data.</li>
+<li><strong>One codebase, front to back:</strong> UI, API, agent logic, and edge functions share types end-to-end.</li>
+</ul>
+<h3>How TypeScript is used in AI, concretely</h3>
+<div class="grid">
+<div class="card"><h4>Agents &amp; tool calling</h4><p>Tools defined once with a Zod schema; every model-proposed call validated before execution. Agent loops, routers, and human-approval flows.</p></div>
+<div class="card"><h4>RAG products</h4><p>Ingestion jobs, vector-store clients (Pinecone, Qdrant, pgvector), typed retrieval, citation-aware answers shared between API and UI.</p></div>
+<div class="card"><h4>Streaming AI APIs</h4><p>Node / edge backends (Next.js, Hono, Fastify, NestJS) streaming tokens over SSE/WebSockets with low ceremony.</p></div>
+<div class="card"><h4>Browser &amp; on-device ML</h4><p>Transformers.js, TensorFlow.js, ONNX Runtime Web — real models running client-side for privacy, cost, and offline use.</p></div>
+<div class="card"><h4>MCP servers</h4><p>The Model Context Protocol's reference SDK is TypeScript-first; most tools-for-agents ship as npm packages.</p></div>
+<div class="card"><h4>Evals &amp; guardrails</h4><p>promptfoo, typed eval datasets, output-schema middleware, cost and trace logging next to the product code.</p></div>
+</div>
+<pre><code>import { tool } from "ai"; import { z } from "zod";
+export const lookupOrder = tool({
+  description: "Look up an order by id",
+  inputSchema: z.object({ orderId: z.string().regex(/^ORD-\d+$/) }),
+  execute: async ({ orderId }) =&gt; db.orders.find(orderId), // fully typed
+});</code></pre>
+<h3>TypeScript's limits</h3>
+<ul>
+<li>No training ecosystem — it calls models, it does not create them.</li>
+<li>Numeric / GPU work is borrowed (WASM, native bindings, or a Python service).</li>
+<li>Runtime is single-threaded per process; CPU-heavy work needs workers or another service.</li>
+</ul>
+<div class="callout"><strong>Choose TypeScript when:</strong> building anything a user touches, agent/application logic around model APIs, RAG products, MCP tools, or a small team shipping a full-stack AI product fast and safely.</div>
+</section>
+
+<div class="langhead" style="background:var(--go)"><h2>Go — the language AI infrastructure runs on</h2><p>The operations layer: fast, concurrent, single-binary services that move AI traffic at scale.</p></div>
+<section id="go">
+<h3>Why Go won cloud infrastructure (and therefore AI infrastructure)</h3>
+<ul>
+<li><strong>Concurrency is the product:</strong> goroutines + channels make it natural to run thousands of simultaneous streaming LLM requests, each waiting on a slow model, without burning memory.</li>
+<li><strong>One static binary:</strong> no runtime, no dependency hell — build once, deploy anywhere. Startup in milliseconds, tiny containers.</li>
+<li><strong>Boring on purpose:</strong> a small language, fast compile, built-in formatting/testing/race detector. Large teams stay productive; this is why Docker, Kubernetes, Terraform, and much of the cloud-native stack are Go.</li>
+<li><strong>Strong standard library for networking:</strong> HTTP servers, proxies, and gRPC are first-class without a framework war.</li>
+</ul>
+<h3>How Go is used in AI, concretely</h3>
+<h4>1. LLM gateways, proxies, and routers</h4>
+<p>The traffic cop layer of production AI: a Go service in front of OpenAI / Anthropic / Azure / self-hosted models handling auth, rate limits, per-team token budgets, model routing (cheap model first, escalate when needed), fallbacks, caching, and audit logging. Go's concurrency + tiny footprint make it the default choice here; several commercial and open-source AI gateways are Go.</p>
+<pre><code>// A streaming proxy sketch: one goroutine per request, cheap and safe.
+func handler(w http.ResponseWriter, r *http.Request) {
+    ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
+    defer cancel()
+    stream, err := llm.Stream(ctx, r) // typed client call to the provider
+    if err != nil { http.Error(w, "upstream", 502); return }
+    for chunk := range stream { fmt.Fprint(w, chunk); w.(http.Flusher).Flush() }
+}</code></pre>
+<h4>2. High-throughput data ingestion for AI</h4>
+<p>Event collectors, log pipelines, document crawlers, and streaming ETL feeding training sets and vector indexes — jobs where Python workers would need far more machines for the same throughput.</p>
+<h4>3. Inference-adjacent services</h4>
+<p>Go wraps and orchestrates model servers: request batching/queueing in front of vLLM/Triton, autoscaling signals, health and load management, and multi-model routing. <strong>Ollama</strong> — the popular local-LLM runner — is written in Go, wrapping llama.cpp: a perfect example of Go as the operational shell around fast native inference.</p>
+<h4>4. Vector and AI platform components</h4>
+<p>Parts of the modern data/AI infra stack are Go (e.g., Milvus's ecosystem includes large Go components; many feature stores, queues, and observability collectors are Go). Kubernetes operators for GPU fleets and model deployments are Go by definition.</p>
+<h4>5. CLI and developer tooling for AI</h4>
+<p>Fast, single-binary CLIs for model management, dataset tools, and platform operations ship in Go because distribution is trivial.</p>
+<h3>Go's limits for AI</h3>
+<ul>
+<li>Almost no ML library ecosystem — no PyTorch, no notebooks, no data-science culture. You will not train in Go.</li>
+<li>The LLM SDK landscape exists (official and community clients, langchaingo) but is thinner and less idiomatic than Python/TypeScript.</li>
+<li>Generics arrived late and the type system is deliberately simple — complex typed domain modelling is more verbose/less expressive than TypeScript or Rust.</li>
+</ul>
+<div class="callout"><strong>Choose Go when:</strong> the problem is <em>scale, concurrency, or operations</em> — gateways, ingestion, orchestration, infra tooling, platform services — especially where one deployable binary and predictable performance matter more than ML libraries.</div>
+</section>
+<div class="langhead" style="background:var(--rs)"><h2>Rust — the language AI gets fast in</h2><p>The performance layer: inference engines, tokenisers, vector search, and on-device ML — where milliseconds and memory are money.</p></div>
+<section id="rust">
+<h3>Why Rust matters more every year in AI</h3>
+<ul>
+<li><strong>C/C++ speed, without C/C++ memory bugs:</strong> the borrow checker guarantees memory safety at compile time — no garbage collector, no pauses, no segfaults in production.</li>
+<li><strong>AI is bottlenecked below the API:</strong> tokenisation, tensor ops, vector search, and data loading decide cost and latency. Those hot paths are increasingly Rust (often replacing C++ in new code).</li>
+<li><strong>Rust is Python's secret engine:</strong> many “Python” AI tools are Rust underneath, exposed to Python via bindings (PyO3).</li>
+</ul>
+<h3>How Rust is used in AI, concretely — with receipts</h3>
+<table>
+<tr><th>System</th><th>What Rust does there</th></tr>
+<tr><td><strong>Hugging Face Tokenizers</strong></td><td>The fast tokeniser library used across the Python ecosystem — Rust core, Python face.</td></tr>
+<tr><td><strong>Candle</strong> (Hugging Face)</td><td>A Rust ML framework for efficient inference, including running LLMs — minimal, hackable, GPU + CPU.</td></tr>
+<tr><td><strong>mistral.rs / llama.cpp-adjacent servers</strong></td><td>Rust LLM inference servers focused on fast, ergonomic local/self-hosted serving.</td></tr>
+<tr><td><strong>Qdrant</strong></td><td>A production vector database written in Rust — HNSW search, filtering, and storage at low latency.</td></tr>
+<tr><td><strong>Polars</strong></td><td>The Rust dataframe engine (Python's fastest alternative to pandas) — data prep for ML at a fraction of the time/memory.</td></tr>
+<tr><td><strong>ONNX Runtime / tokenisers / safetensors</strong></td><td>Rust appears across the inference plumbing: model formats, runtimes, and loading paths.</td></tr>
+<tr><td><strong>Burn</strong></td><td>A Rust deep-learning framework with a serious training story — the exception that shows where Rust ML is heading.</td></tr>
+</table>
+<h4>1. Inference engines and serving hot paths</h4>
+<p>When a team self-hosts models and the bill is GPU-hours, the serving layer's efficiency is profit. Rust is used to build inference servers, schedulers, and KV-cache-aware routers, and to write the CPU-side hot loops (tokenisation, sampling, detokenisation) that otherwise starve the GPU.</p>
+<h4>2. Vector search and retrieval internals</h4>
+<p>ANN indexes (HNSW), embedding stores, and hybrid search engines are latency-critical data structures — Rust (Qdrant) and C++ (FAISS) territory. Your TypeScript/Python RAG app calls them; Rust makes them fast.</p>
+<h4>3. Data infrastructure for ML</h4>
+<p>Polars, Arrow implementations, fast loaders and parsers: the unglamorous work of feeding training and inference, done 5–50× faster than pure Python equivalents.</p>
+<h4>4. Edge, embedded, and WebAssembly ML</h4>
+<p>Rust compiles to WASM and to microcontrollers: on-device inference where memory is measured in megabytes, battery matters, and a garbage collector is not welcome. Privacy-sensitive and safety-critical ML (vehicles, medical devices, industrial) increasingly prefers Rust's guarantees.</p>
+<pre><code>// The Rust shape: errors are values, resources have owners, nothing is null.
+fn embed_batch(texts: &amp;[String]) -&gt; Result&lt;Vec&lt;Vec&lt;f32&gt;&gt;, EmbedError&gt; {
+    let tokens = tokenize(texts)?;          // `?` propagates a typed error
+    model.forward(&amp;tokens)                  // no GC, no data races — compiler-proven
+}</code></pre>
+<h3>Rust's limits — be honest</h3>
+<ul>
+<li><strong>Steepest learning curve of the four:</strong> ownership and lifetimes take weeks to internalise; compile times are slow.</li>
+<li>The training/research ecosystem is young (Candle, Burn) next to PyTorch's universe.</li>
+<li>Iteration speed is the slowest of the four — wrong tool for experiments and demos.</li>
+<li>Hiring pool is the smallest; every Rust component is a long-term maintenance commitment.</li>
+</ul>
+<div class="callout rust"><strong>Choose Rust when:</strong> the bottleneck is proven and expensive — inference hot paths, vector search, tokenisers, data engines, WASM/edge/on-device ML — or when memory safety is a hard requirement. Earn Rust with measurements; never adopt it on fashion.</div>
+</section>
+
+<section id="compare">
+<p class="kicker">Side by Side</p>
+<h2>Comparison table</h2>
+<table>
+<tr><th>Dimension</th><th>Python</th><th>TypeScript</th><th>Go</th><th>Rust</th></tr>
+<tr><td>AI home layer</td><td>Training, research, data</td><td>Products, agents, UI</td><td>Infra, gateways, ops</td><td>Inference internals, performance</td></tr>
+<tr><td>Speed</td><td>Slow (fast via native libs)</td><td>Moderate (JIT)</td><td>Fast (native, GC)</td><td>Fastest (native, no GC)</td></tr>
+<tr><td>Type safety</td><td>Optional hints</td><td>Strong (compile-time)</td><td>Strong, simple</td><td>Strongest (memory + types)</td></tr>
+<tr><td>Concurrency</td><td>Weak CPU, OK I/O async</td><td>Async I/O, single-thread core</td><td>Excellent (goroutines)</td><td>Excellent (fearless concurrency)</td></tr>
+<tr><td>ML ecosystem</td><td>★★★★★ definitive</td><td>★★★ SDKs, browser ML</td><td>★★ clients only</td><td>★★★ growing (Candle, Burn)</td></tr>
+<tr><td>Time to first demo</td><td>Fastest</td><td>Fast</td><td>Moderate</td><td>Slowest</td></tr>
+<tr><td>Deployment</td><td>Environments, containers</td><td>Web / Node / edge, trivial</td><td>Single binary, trivial</td><td>Single binary / WASM</td></tr>
+<tr><td>Signature AI artefact</td><td>PyTorch, HF Transformers</td><td>Vercel AI SDK, MCP SDK</td><td>Ollama, K8s AI operators</td><td>Qdrant, Tokenizers, Polars</td></tr>
+<tr><td>Biggest risk</td><td>Performance / GIL at scale</td><td>CPU-heavy work</td><td>No ML libraries</td><td>Learning curve, iteration speed</td></tr>
+</table>
+</section>
+
+<section id="together">
+<p class="kicker">How Real Systems Combine Them</p>
+<h2>One product, four languages — a worked architecture</h2>
+<p>Imagine a production AI platform — a document-intelligence SaaS with chat, agents, and an API:</p>
+<ol>
+<li><strong>TypeScript</strong> — the web app (streaming chat, review UI), the public API, agent orchestration, tool calling, and the MCP server exposing the product to other agents.</li>
+<li><strong>Python</strong> — offline model fine-tuning for extraction quality, the evaluation harness that gates every release, dataset curation jobs, and a FastAPI extraction service using Pydantic schemas.</li>
+<li><strong>Go</strong> — the LLM gateway in front of three providers (budgets, routing, fallbacks, audit), the high-volume document-ingestion pipeline, and the Kubernetes operator managing GPU nodes.</li>
+<li><strong>Rust</strong> — inside the stack you bought or built: Qdrant for vector search, the HF tokeniser inside the Python services, Polars for data prep — plus a custom Rust WASM module doing on-device redaction in the browser before text ever leaves the user's machine.</li>
+</ol>
+<p>Nobody “chose four languages”. Each layer chose the tool whose strengths matched its bottleneck, and the boundaries are APIs and schemas — which is why typed contracts (Pydantic, Zod, protobuf) matter more than any single language.</p>
+<div class="callout good"><strong>Boundary rule:</strong> languages meet at contracts, never at shared memory. Define the schema once (JSON Schema / protobuf / OpenAPI), generate or validate types on both sides, and any layer can be rewritten in another language without drama.</div>
+</section>
+
+<section id="choose">
+<p class="kicker">Decision Guide</p>
+<h2>Choosing, in five questions</h2>
+<ol>
+<li><strong>Are you creating or improving a model?</strong> → Python. Non-negotiable today.</li>
+<li><strong>Are you building what a user sees and clicks?</strong> → TypeScript.</li>
+<li><strong>Is the hard part thousands of concurrent requests, gateways, or platform plumbing?</strong> → Go.</li>
+<li><strong>Is the hard part a measured hot path, memory limit, or safety guarantee?</strong> → Rust.</li>
+<li><strong>More than one answer?</strong> → You have a layered system. Assign per layer, connect with schemas, and resist rewriting a working layer for purity.</li>
+</ol>
+<h3>Learning path, if you want all four</h3>
+<ul>
+<li><strong>Python first</strong> (weeks): NumPy/pandas intuition, PyTorch basics, one fine-tune, FastAPI + Pydantic.</li>
+<li><strong>TypeScript second</strong> (weeks): strict mode, Zod, one RAG app, one agent with tools, streaming UI.</li>
+<li><strong>Go third</strong> (days–weeks): goroutines, one streaming LLM gateway, one ingestion worker. Go is deliberately quick to learn.</li>
+<li><strong>Rust last, targeted</strong> (months, ongoing): ownership first, then one real component — a tokeniser-speed benchmark, a Candle inference demo, or a WASM module — not a rewrite of everything.</li>
+</ul>
+<div class="callout"><strong>Final takeaway:</strong> Python makes models, TypeScript products them, Go operates them, Rust accelerates them. Senior AI engineering is not loyalty to a language — it is knowing which layer you are in, and reaching for the tool that layer rewards.</div>
+</section>
+</main>
+<footer><div class="wrap"><p>Four Languages for AI — Python, TypeScript, Go &amp; Rust • Prepared for Ranadhir Ghosh • November 11, 2026 • Companion: “TypeScript for AI” (sent earlier today)</p><p class="small">Code examples are illustrative teaching patterns; verify current library APIs in official docs before production use.</p></div></footer>
+</body>
+</html>

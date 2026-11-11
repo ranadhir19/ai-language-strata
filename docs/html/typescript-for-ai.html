@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript for AI — A Comprehensive Learning & Tutorial Guide</title>
+<style>
+:root{--blue:#3178c6;--dark:#0f172a;--slate:#334155;--light:#f8fafc;--border:#e2e8f0;--green:#0f766e;--amber:#b45309;--purple:#6d28d9}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--dark);line-height:1.65;background:#fff}
+header{background:linear-gradient(135deg,#0f172a,#1e3a5f 55%,#3178c6);color:#fff;padding:56px 24px 44px}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+header h1{font-size:42px;line-height:1.1;margin:0 0 14px}header p{font-size:19px;opacity:.92;max-width:760px}
+.badge{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:5px 11px;border-radius:999px;font-size:13px;margin-right:8px}
+nav{background:var(--light);border-bottom:1px solid var(--border);padding:18px 0}nav a{color:var(--blue);text-decoration:none;margin-right:16px;font-weight:600;font-size:14px}
+h2{font-size:30px;margin:48px 0 12px;padding-top:18px;border-top:2px solid var(--border)}h2:first-of-type{border-top:none}
+h3{font-size:21px;margin:28px 0 8px}h4{font-size:17px;margin:20px 0 6px}
+p,li{font-size:16px;color:#1e293b}code{background:#eef2ff;padding:2px 6px;border-radius:6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em}
+pre{background:#0f172a;color:#e2e8f0;padding:18px;border-radius:12px;overflow:auto;font-size:14px;line-height:1.5}pre code{background:none;color:inherit;padding:0}
+.callout{border-left:5px solid var(--blue);background:#eff6ff;padding:16px 18px;border-radius:8px;margin:18px 0}
+.good{border-color:var(--green);background:#f0fdfa}.warn{border-color:var(--amber);background:#fffbeb}.purple{border-color:var(--purple);background:#f5f3ff}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:#f1f5f9}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:18px 0}.card{border:1px solid var(--border);border-radius:12px;padding:18px;background:#fff}.card h4{margin-top:0}
+.check li{margin:6px 0}.small{font-size:14px;color:var(--slate)}footer{background:var(--dark);color:#cbd5e1;padding:32px 0;margin-top:60px}
+.kicker{color:var(--blue);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<span class="badge">Learning Guide</span><span class="badge">Tutorial</span><span class="badge">AI Engineering</span>
+<h1>TypeScript for AI</h1>
+<p>How TypeScript became one of the most practical languages for building real AI products — LLM applications, agents, RAG systems, AI APIs, and full-stack AI platforms — and when you should (and should not) use it.</p>
+<p class="small" style="color:#e2e8f0">Prepared for Ranadhir Ghosh • November 11, 2026 • A comprehensive, self-contained tutorial</p>
+</div></header>
+<nav><div class="wrap">
+<a href="#why">Why TypeScript</a><a href="#foundations">Foundations</a><a href="#tutorial">Tutorial</a><a href="#ai">TypeScript in AI</a><a href="#when">When to Use It</a><a href="#projects">Projects</a><a href="#exercises">Exercises</a>
+</div></nav>
+<main class="wrap">
+
+<section id="overview">
+<p class="kicker">Start Here</p>
+<h2>What this guide covers</h2>
+<p>TypeScript is JavaScript with a static type system. That one sentence understates its importance. In modern AI engineering, most of the <em>product layer</em> — the user interface, API, agent orchestration, tool calling, streaming, evaluation harness, and integration glue — is increasingly written in TypeScript, even when model training itself stays in Python.</p>
+<p>This guide teaches TypeScript from the ground up, then shows exactly where it fits in the AI stack: calling LLMs safely, building agents that cannot pass malformed arguments to tools, validating structured outputs, streaming tokens to a UI, connecting vector databases, building MCP servers, and shipping production AI systems on Node.js, browsers, and the edge.</p>
+<div class="callout"><strong>The core idea:</strong> AI systems are probabilistic. Your application code around them should not be. TypeScript gives you contracts — for prompts, tool inputs, model outputs, API payloads, and state — so failures are caught at compile time instead of in production.</div>
+<h3>Who this is for</h3>
+<ul>
+<li>Engineers who know some JavaScript or another language and want TypeScript properly, not just syntax tips.</li>
+<li>AI builders moving from Python notebooks to production products.</li>
+<li>Architects deciding between Python, TypeScript, or a hybrid stack for an AI system.</li>
+</ul>
+<h3>How to use this tutorial</h3>
+<ol>
+<li>Read Part 1–2 for the mental model.</li>
+<li>Type every code example yourself — do not just read them.</li>
+<li>Do the exercises at the end of each major section.</li>
+<li>Build the three capstone projects in Part 6.</li>
+</ol>
+</section>
+
+<section id="why">
+<p class="kicker">Part 1 — The Case</p>
+<h2>1. Why TypeScript matters now</h2>
+<h3>1.1 JavaScript won distribution; TypeScript won maintainability</h3>
+<p>JavaScript runs everywhere: browsers, Node.js servers, mobile (React Native), desktop (Electron), and edge runtimes (Cloudflare Workers, Vercel Edge, Deno). That ubiquity made it the default language for product interfaces. But large JavaScript codebases become fragile: a function expects <code>{ userId: string }</code>, someone passes a number, and nothing fails until runtime.</p>
+<p>TypeScript adds static types that are erased at compile time — you get safety during development with zero runtime cost. The compiler, editor autocomplete, and refactoring tools become a second pair of eyes on every change.</p>
+
+<h3>1.2 The five superpowers</h3>
+<div class="grid">
+<div class="card"><h4>1. Contracts</h4><p>Interfaces describe exactly what data a function, API, tool, or model must receive and return.</p></div>
+<div class="card"><h4>2. Refactoring confidence</h4><p>Rename a field and the compiler finds every broken call site instantly.</p></div>
+<div class="card"><h4>3. Editor intelligence</h4><p>Autocomplete for SDKs (OpenAI, Anthropic, LangChain, Vercel AI SDK) is dramatically better with types.</p></div>
+<div class="card"><h4>4. Safer JSON</h4><p>AI is JSON in, JSON out. TypeScript + a validator (Zod) turns untrusted JSON into trusted data.</p></div>
+<div class="card"><h4>5. Full-stack unity</h4><p>One language and one set of types shared between frontend, backend, and edge.</p></div>
+</div>
+
+<h3>1.3 A 30-second example</h3>
+<pre><code>// JavaScript — this bug ships silently
+function charge(user, amount) { return user.id + amount; }
+charge({ id: "u1" }, "10"); // "u110" — string concatenation, not addition
+
+// TypeScript — the compiler stops both errors
+function charge(user: { id: string }, amount: number): string {
+  return `${user.id}:${amount.toFixed(2)}`;
+}
+charge({ id: "u1" }, "10"); // ❌ Error: string is not assignable to number
+</code></pre>
+</section>
+<section id="foundations">
+<p class="kicker">Part 2 — Foundations</p>
+<h2>2. TypeScript foundations, properly</h2>
+<h3>2.1 Setup in 2 minutes</h3>
+<pre><code>npm init -y
+npm install -D typescript tsx @types/node
+npx tsc --init
+# Run a file directly during learning:
+npx tsx src/index.ts
+# Build for production:
+npx tsc</code></pre>
+<p>Key <code>tsconfig.json</code> settings to turn on from day one: <code>"strict": true</code>, <code>"noUncheckedIndexedAccess": true</code>, <code>"exactOptionalPropertyTypes": true</code> (when your team can handle it), and <code>"module": "NodeNext"</code> for modern Node projects.</p>
+
+<h3>2.2 Basic types and inference</h3>
+<pre><code>let model: string = "gpt-5.1";
+let temperature: number = 0.2;
+let streaming: boolean = true;
+let tags: string[] = ["rag", "agents"];
+
+// Inference: TypeScript already knows these types — don't annotate everything
+const maxTokens = 1024;              // number (literal context matters)
+const config = { model, temperature }; // { model: string, temperature: number }
+
+// Avoid `any`. Prefer `unknown` for data you haven't validated yet.
+let modelReply: unknown = JSON.parse(rawText);</code></pre>
+<div class="callout warn"><strong>Rule:</strong> <code>any</code> turns the compiler off. <code>unknown</code> keeps it on — you must prove what the data is before using it. Almost all AI I/O should start as <code>unknown</code>.</div>
+
+<h3>2.3 Interfaces, type aliases, and unions</h3>
+<pre><code>interface ChatMessage {
+  role: "system" | "user" | "assistant" | "tool";
+  content: string;
+  name?: string; // optional
+}
+
+type ModelProvider = "openai" | "anthropic" | "google" | "azure-openai";
+
+type Result&lt;T&gt; =
+  | { ok: true; value: T }
+  | { ok: false; error: string };
+
+const msg: ChatMessage = { role: "user", content: "Explain RAG simply." };</code></pre>
+<p><strong>Discriminated unions</strong> (like <code>Result</code> above) are one of TypeScript's most valuable patterns for AI: the compiler forces you to handle success and failure separately. No more forgetting the error branch.</p>
+
+<h3>2.4 Functions, generics, and narrowing</h3>
+<pre><code>function first&lt;T&gt;(items: readonly T[]): T | undefined {
+  return items[0];
+}
+const firstTag = first(tags); // string | undefined — handled honestly
+
+function isChatMessage(value: unknown): value is ChatMessage {
+  return typeof value === "object" &amp;&amp; value !== null
+    &amp;&amp; "role" in value &amp;&amp; "content" in value;
+}</code></pre>
+
+<h3>2.5 Classes, async, and errors</h3>
+<pre><code>class TokenBudget {
+  constructor(private readonly limit: number) {}
+  private used = 0;
+  spend(n: number): void {
+    if (this.used + n &gt; this.limit) throw new Error("Token budget exceeded");
+    this.used += n;
+  }
+  get remaining(): number { return this.limit - this.used; }
+}
+
+async function withRetry&lt;T&gt;(fn: () =&gt; Promise&lt;T&gt;, tries = 3): Promise&lt;T&gt; {
+  let last: unknown;
+  for (let i = 0; i &lt; tries; i++) {
+    try { return await fn(); } catch (e) { last = e; }
+  }
+  throw last;
+}</code></pre>
+
+<h3>2.6 The type tools you will use daily</h3>
+<table><tr><th>Utility</th><th>What it does</th><th>AI example</th></tr>
+<tr><td><code>Partial&lt;T&gt;</code></td><td>All fields optional</td><td>Patching a prompt template</td></tr>
+<tr><td><code>Pick&lt;T, K&gt;</code></td><td>Keep selected fields</td><td>Exposing only safe user fields to a model</td></tr>
+<tr><td><code>Omit&lt;T, K&gt;</code></td><td>Remove fields</td><td>Stripping secrets before logging</td></tr>
+<tr><td><code>Record&lt;K, V&gt;</code></td><td>Dictionary type</td><td>Model-name → pricing table</td></tr>
+<tr><td><code>Awaited&lt;T&gt;</code></td><td>Unwrap a Promise</td><td>Typing async tool results</td></tr>
+<tr><td><code>z.infer&lt;typeof schema&gt;</code></td><td>Type from a Zod schema</td><td>One source of truth for validation + types</td></tr>
+</table>
+</section>
+
+<section id="tutorial">
+<p class="kicker">Part 3 — Hands-On Tutorial</p>
+<h2>3. Tutorial: a type-safe LLM call, step by step</h2>
+<p><strong>Goal:</strong> call a model, force a structured answer, validate it, and handle every failure mode — with the compiler proving you did.</p>
+<h3>Step 1 — Define the contract first</h3>
+<pre><code>import { z } from "zod";
+
+export const SummarySchema = z.object({
+  title: z.string().min(3),
+  bullets: z.array(z.string()).min(1).max(5),
+  sentiment: z.enum(["positive", "neutral", "negative"]),
+  confidence: z.number().min(0).max(1),
+});
+export type Summary = z.infer&lt;typeof SummarySchema&gt;;</code></pre>
+<h3>Step 2 — Call the model for JSON, then validate (never trust)</h3>
+<pre><code>async function summarise(text: string): Promise&lt;Summary&gt; {
+  const raw = await callModel({ // your provider SDK call
+    system: "Return ONLY JSON matching the requested schema.",
+    user: text,
+    responseFormat: "json",
+  });
+  const parsed: unknown = JSON.parse(raw);
+  return SummarySchema.parse(parsed); // throws a precise error if the model drifted
+}</code></pre>
+<h3>Step 3 — Stream to a user interface safely</h3>
+<pre><code>// Vercel AI SDK pattern (illustrative)
+import { streamText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+export async function POST(req: Request) {
+  const { prompt }: { prompt: string } = await req.json();
+  const result = streamText({ model: openai("gpt-5.1"), prompt });
+  return result.toTextStreamResponse(); // token-by-token streaming to the browser
+}</code></pre>
+<div class="callout good"><strong>Lesson:</strong> Notice the order — contract → call → validate → present. Reversing it (trusting raw model output) is the #1 cause of brittle AI apps.</div>
+</section>
+<section id="ai">
+<p class="kicker">Part 4 — The Core of This Guide</p>
+<h2>4. How TypeScript is used in AI — in depth</h2>
+
+<h3>4.1 LLM application layer (the biggest use)</h3>
+<p>Chatbots, copilots, support agents, document Q&amp;A, summarisation, extraction, classification, and code assistants are mostly <em>software around an API</em>. TypeScript dominates this layer because the official and community SDKs are excellent: OpenAI, Anthropic, Google Gemini, Azure OpenAI, Cohere, Mistral, plus the Vercel AI SDK and LangChain.js. Typed SDKs mean model names, message shapes, tool schemas, and streaming events autocomplete in your editor and break loudly when a provider changes an API.</p>
+
+<h3>4.2 AI agents and tool calling — where types save you</h3>
+<p>An agent is a loop: model → chooses a tool → your code runs it → result goes back to the model. The danger point is the tool boundary: a model can hallucinate argument names, types, or values. In TypeScript you define each tool once — schema + implementation + inferred type — and the framework validates every model-proposed call before it executes.</p>
+<pre><code>import { tool } from "ai";
+import { z } from "zod";
+
+export const getWeather = tool({
+  description: "Get current weather for a city",
+  inputSchema: z.object({
+    city: z.string(),
+    units: z.enum(["celsius", "fahrenheit"]).default("celsius"),
+  }),
+  execute: async ({ city, units }) =&gt; {
+    // `city` and `units` are fully typed here — no guessing, no any
+    return { city, units, temp: 21, condition: "sunny" };
+  },
+});</code></pre>
+<p>Use this pattern for database lookups, calculators, CRM actions, ticket creation, web search, and code execution wrappers. <strong>Never execute a raw model-generated call without schema validation.</strong></p>
+
+<h3>4.3 RAG (Retrieval-Augmented Generation)</h3>
+<p>A typical TypeScript RAG pipeline: ingest documents (loaders, chunking) → embed (provider SDK) → store (Pinecone, Weaviate, Qdrant, pgvector via Prisma/Drizzle, Turbopuffer) → retrieve with typed filters → assemble a typed prompt context → answer with citations. TypeScript is ideal here because ingestion jobs, the API, and the chat UI are one codebase sharing the same <code>Chunk</code>, <code>Document</code>, and <code>Citation</code> types — a field renamed in the store breaks the UI build immediately, not in production.</p>
+
+<h3>4.4 Structured outputs and data extraction</h3>
+<p>Invoice parsing, resume screening, medical-note structuring, lead qualification, evaluation scoring — all reduce to "unstructured in, trustworthy JSON out." The TypeScript pattern is Zod schema → JSON Schema for the model → parse → typed downstream code (database insert, workflow trigger). This is arguably TypeScript's single most valuable AI role.</p>
+
+<h3>4.5 AI backends, APIs, and streaming infrastructure</h3>
+<p>Node.js (Fastify, NestJS, Hono, Express) and edge runtimes are natural homes for AI APIs: they stream well (SSE / WebSockets), handle many concurrent long-running model calls with async I/O, deploy cheaply, and share types with the frontend. NestJS + TypeScript is a common enterprise choice; Hono + TypeScript is a common edge choice.</p>
+
+<h3>4.6 Frontend AI experiences</h3>
+<p>Streaming chat UIs, token-by-token rendering, optimistic updates, voice interfaces, and in-browser inference all live in TypeScript/React (or React Native). Libraries: Vercel AI SDK UI hooks (<code>useChat</code>, <code>useCompletion</code>), LangChain callbacks, and assistant-ui. No other language can do this layer at all — the browser speaks JavaScript/TypeScript.</p>
+
+<h3>4.7 TensorFlow.js and in-browser / on-device ML</h3>
+<p>TensorFlow.js, ONNX Runtime Web, Transformers.js (Hugging Face), and MediaPipe let you run real models — classification, embeddings, sentiment, image models, small LLMs — directly in the browser or Node, with privacy (data never leaves the device), zero server cost, and offline capability. Teachable examples: a client-side toxicity filter before sending text to a paid API, or on-device embeddings for a private notes app.</p>
+
+<h3>4.8 MCP servers and AI tooling</h3>
+<p>The Model Context Protocol's reference SDK is TypeScript-first. Most MCP servers — tools that expose databases, filesystems, APIs, and SaaS apps to Claude, ChatGPT, and other agents — are written in TypeScript and published via npm/npx. If you build tools <em>for</em> agents (not just with them), TypeScript is the default.</p>
+
+<h3>4.9 Evaluation, observability, and guardrails</h3>
+<p>Type-safe eval harnesses (promptfoo — itself TypeScript, LangSmith JS, Braintrust), structured logging of typed traces, cost accounting per model/feature, and guardrail middleware (input validation, PII redaction, output schema checks) are all commonly TypeScript in product teams, because they sit next to the product code they measure.</p>
+
+<h3>4.10 Full-stack AI platforms and SaaS</h3>
+<p>Put it together and you get the modern AI SaaS shape: Next.js / Remix frontend + TypeScript API + Postgres/pgvector + a Python microservice <em>only where needed</em> (heavy training, specialised libraries). Companies choose this because one typed codebase is faster for small teams to change safely — and AI products change weekly.</p>
+</section>
+
+<section id="when">
+<p class="kicker">Part 5 — Judgement</p>
+<h2>5. When to use TypeScript — and when not to</h2>
+<table>
+<tr><th>Use TypeScript when…</th><th>Prefer Python (or another tool) when…</th></tr>
+<tr><td>Building a user-facing AI product, chat UI, or copilot</td><td>Training or fine-tuning models (PyTorch, JAX, HF Trainer)</td></tr>
+<tr><td>Agent orchestration, tool calling, workflow glue</td><td>Heavy data science, notebooks, statistical analysis (pandas, NumPy)</td></tr>
+<tr><td>RAG product layer, APIs, streaming, edge deployment</td><td>Research prototyping where library coverage matters most</td></tr>
+<tr><td>Structured extraction that feeds databases / workflows</td><td>Classical ML pipelines (scikit-learn, XGBoost) and MLOps training jobs</td></tr>
+<tr><td>MCP servers and tools for agents</td><td>GPU-heavy inference you self-host (vLLM ecosystem is Python-centric)</td></tr>
+<tr><td>Browser / on-device ML (TensorFlow.js, Transformers.js)</td><td>One-off analysis where type safety buys nothing</td></tr>
+</table>
+<div class="callout purple"><strong>The production answer is usually hybrid:</strong> Python for training, data science, and specialised ML services; TypeScript for everything the user touches and everything that orchestrates models. They communicate over HTTP/gRPC with — ideally — schemas generated from a single contract.</div>
+
+<h3>Common mistakes</h3>
+<ul class="check">
+<li>Using <code>any</code> for model outputs instead of <code>unknown</code> + validation.</li>
+<li>Trusting a model's JSON because it "usually works" — validate every time; models drift.</li>
+<li>Putting business logic in prompts that belongs in typed code (pricing, permissions, eligibility).</li>
+<li>No token/cost budget type or guard — a runaway agent loop is a billing incident.</li>
+<li>Ignoring streaming UX: users forgive latency they can watch; they don't forgive a spinner.</li>
+<li>Skipping evals because the demo worked. Type the eval dataset like you type the app.</li>
+</ul>
+
+<h3>Architecture pattern: the typed AI sandwich</h3>
+<ol>
+<li><strong>Typed input boundary</strong> — validate user/API input with Zod.</li>
+<li><strong>Typed context assembly</strong> — retrieval results and memory as defined interfaces, never string soup by accident.</li>
+<li><strong>Model call</strong> — typed SDK, explicit model, temperature, and budget parameters.</li>
+<li><strong>Typed output boundary</strong> — schema-validate structured output; treat free text as untrusted display data.</li>
+<li><strong>Typed actions</strong> — tools and side-effects only through validated, permission-checked functions.</li>
+<li><strong>Traces</strong> — log the typed shapes (redacted) so evals and debugging are possible.</li>
+</ol>
+</section>
+<section id="projects">
+<p class="kicker">Part 6 — Build</p>
+<h2>6. Three capstone projects</h2>
+<div class="card"><h4>Project 1 — Type-Safe Document Q&amp;A (RAG)</h4><p>Ingest PDFs, chunk and embed them, store in pgvector, answer with typed citations. Skills: ingestion pipelines, embeddings, retrieval, citation types shared API↔UI. Stretch: add a confidence field to the answer schema and refuse below a threshold.</p></div>
+<div class="card"><h4>Project 2 — Tool-Using Support Agent</h4><p>An agent with three Zod-validated tools (order lookup, refund eligibility — computed in code, never by the model — and ticket creation), a token budget class, and full trace logging. Skills: tool calling, guardrails, agent loops. Stretch: add human approval before the refund tool executes.</p></div>
+<div class="card"><h4>Project 3 — Structured Extraction Service</h4><p>An API that turns invoices or resumes into validated JSON, stores them via a typed ORM, and exposes a review UI. Skills: structured outputs, error queues for failed parses, evals on a labelled set. Stretch: measure extraction accuracy before/after a prompt change — with a typed eval harness.</p></div>
+</section>
+
+<section id="exercises">
+<p class="kicker">Part 7 — Practice</p>
+<h2>7. Exercises (do these, in order)</h2>
+<ol>
+<li>Convert a JavaScript file you own to TypeScript with <code>strict: true</code> and fix every error without using <code>any</code>.</li>
+<li>Model an LLM conversation as a discriminated union so an assistant message <em>must</em> have either text or tool calls — never neither.</li>
+<li>Write a Zod schema for a job-posting extraction (title, company, salary range, remote flag) and validate 10 real model outputs against it. Log every failure mode.</li>
+<li>Build the <code>withRetry</code> + <code>TokenBudget</code> utilities from §2.5 into an agent loop and deliberately exhaust the budget.</li>
+<li>Stream a model response to a web page with the Vercel AI SDK; then add a typed status indicator (connecting / streaming / done / error).</li>
+<li>Write one MCP server exposing a single read-only tool (e.g., search your own notes) and call it from an MCP client.</li>
+<li>Run one model in the browser with Transformers.js (sentiment or embeddings) and compare latency/privacy against the API version.</li>
+</ol>
+<h3>Further learning</h3>
+<ul>
+<li>TypeScript Handbook (typescriptlang.org) — the official, excellent source; do the "Everyday Types" and "Narrowing" chapters twice.</li>
+<li>Total TypeScript (Matt Pocock) — the best advanced-types training.</li>
+<li>Vercel AI SDK docs, LangChain.js docs, and the MCP TypeScript SDK — read them as worked examples of large typed APIs.</li>
+<li>Zod documentation — validation is half of practical TypeScript-for-AI.</li>
+<li>TensorFlow.js and Transformers.js guides for the on-device path.</li>
+</ul>
+<div class="callout good"><strong>Final takeaway:</strong> Learn Python to understand models. Learn TypeScript to ship AI products people can use, trust, and pay for. The strongest AI engineers in 2026 are fluent in the boundary between the two — and TypeScript is how that boundary is made safe.</div>
+</section>
+</main>
+<footer><div class="wrap"><p>TypeScript for AI — Comprehensive Learning &amp; Tutorial Guide • Prepared for Ranadhir Ghosh • November 11, 2026</p><p class="small">Code examples are illustrative teaching patterns; check your provider SDK's current docs for exact model names and API signatures before production use.</p></div></footer>
+</body>
+</html>
